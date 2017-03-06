@@ -1,5 +1,6 @@
 package services;
 
+import java.sql.Connection;
 import java.util.ArrayList;
 
 import javax.ws.rs.GET;
@@ -9,11 +10,25 @@ import javax.ws.rs.Produces;
 
 import com.google.gson.Gson;
 
+import Conn.Access;
+import Conn.Connect;
 import entities.Product;
-import Controller.AccessManager;
+import Conn.Access;
+import Conn.Connect;
+
 
 @Path("/productService")
 public class ProductService {
+	Connect db;
+	Connection con;
+	Access access;
+	
+	public ProductService() throws Exception {
+		db = new Connect();
+		con = db.getConnection();
+		access = new Access();
+	}
+	
 	@GET
 	@Path("/products")
 	@Produces("application/json")
@@ -21,7 +36,7 @@ public class ProductService {
 		String products = null;
 		ArrayList<Product> productList = new ArrayList<Product>();
 		try {
-			productList = new AccessManager().getProducts();
+			productList = access.getProducts(con);
 			Gson gson = new Gson();
 			products = gson.toJson(productList);
 		} catch (Exception e) {
@@ -37,7 +52,7 @@ public class ProductService {
 		String products = null;
 		ArrayList<Product> productList = new ArrayList<Product>();
 		try {
-			productList = new AccessManager().getProductById(id);
+			productList = access.getProductById(con,id);
 			Gson gson = new Gson();
 			products = gson.toJson(productList);
 		} catch (Exception e) {
@@ -53,7 +68,23 @@ public class ProductService {
 		String products = null;
 		ArrayList<Product> productList = new ArrayList<Product>();
 		try {
-			productList = new AccessManager().getProductsByCat(id);
+			productList = access.getProductsByCat(con,id);
+			Gson gson = new Gson();
+			products = gson.toJson(productList);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return products;
+	}
+	
+	@GET
+	@Path("/product/pname/{name}")
+	@Produces("application/json")
+	public String productsByName(@PathParam("name") String name) {
+		String products = null;
+		ArrayList<Product> productList = new ArrayList<Product>();
+		try {
+			productList = access.getProductByName(con,name);
 			Gson gson = new Gson();
 			products = gson.toJson(productList);
 		} catch (Exception e) {
@@ -69,7 +100,39 @@ public class ProductService {
 		String products = null;
 		ArrayList<Product> productList = new ArrayList<Product>();
 		try {
-			productList = new AccessManager().getProductsByVendor(id);
+			productList = access.getProductsByVendor(con,id);
+			Gson gson = new Gson();
+			products = gson.toJson(productList);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return products;
+	}
+	
+	@GET
+	@Path("/trending")
+	@Produces("application/json")
+	public String trending() {
+		String products = null;
+		ArrayList<Product> productList = new ArrayList<Product>();
+		try {
+			productList = access.getTrending(con);
+			Gson gson = new Gson();
+			products = gson.toJson(productList);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return products;
+	}
+	
+	@GET
+	@Path("/discounts")
+	@Produces("application/json")
+	public String discounts() {
+		String products = null;
+		ArrayList<Product> productList = new ArrayList<Product>();
+		try {
+			productList = access.getDiscounted(con);
 			Gson gson = new Gson();
 			products = gson.toJson(productList);
 		} catch (Exception e) {
